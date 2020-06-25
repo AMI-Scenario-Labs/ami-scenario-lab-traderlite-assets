@@ -110,6 +110,15 @@ helm install traderlite --set key=value[,key=value] --namespace traderlite .
 
 This sets the Helm release name to `traderlite` and creates all Kubernetes resources in a namespace called `traderlite`.
 
+## Upgrading the Chart
+
+You can perform upgrades to this chart by setting the current directory to the folder where this chart is located and running the following command:
+
+```console
+helm upgrade traderlite --set kafkaIntegration.enabled=true --set global.kafkaAccess.apiKey=$2 --reuse-values ../traderlite
+```
+This will republish the Helm Release which was called `traderlite` ( from the install, names have to match ) and updating some values in the existing chart.  When setting the **--reuse-values** flag, it will reuse all the other existing values.  Depending on what your present working directory is, you need to finally let helm know where the path to the original chart is located. 
+
 ## Uninstalling the Chart
 
 ```console

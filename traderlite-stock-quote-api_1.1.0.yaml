@@ -1,0 +1,147 @@
+swagger: '2.0'
+info:
+  title: TraderLite Stock Quote API
+  x-ibm-name: traderlite-stock-quote-api
+  version: 1.1.0
+host: $(catalog.host)
+schemes:
+  - https
+basePath: /jamilspain
+produces:
+  - application/json
+consumes:
+  - application/json
+security:
+  - clientID: []
+securityDefinitions:
+  clientID:
+    type: apiKey
+    in: header
+    name: X-IBM-Client-Id
+x-ibm-configuration:
+  properties:
+    target-url:
+      value: 'https://cloud.iexapis.com/stable/stock/'
+      description: URL of the proxy policy
+      encoded: false
+    openldap:
+      value: ''
+      description: Username from OpenLDAP
+    token:
+      value: ''
+  cors:
+    enabled: true
+  gateway: datapower-api-gateway
+  type: rest
+  phase: realized
+  enforced: true
+  testable: true
+  assembly:
+    execute:
+      - switch:
+          version: 2.0.0
+          title: switch
+          case:
+            - condition: 'true'
+              execute:
+                - invoke:
+                    version: 2.0.0
+                    title: invoke
+                    header-control:
+                      type: blacklist
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    target-url: >-
+                      https://stock-trader-quote.us-south.cf.appdomain.cloud/stocks/stock-quote/djia
+            - otherwise:
+                - invoke:
+                    title: invoke
+                    version: 2.0.0
+                    verb: GET
+                    target-url: >-
+                      https://cloud.iexapis.com/stable/stock/$(request.parameters.symbol)/quote?token=$(api.properties.token)
+                    follow-redirects: false
+                    timeout: 60
+                    parameter-control:
+                      type: blacklist
+                    header-control:
+                      type: blacklist
+                      values:
+                        - ^X-IBM-Client-Id$
+                    inject-proxy-headers: true
+  activity-log:
+    enabled: true
+    error-content: header
+    success-content: activity
+  application-authentication:
+    certificate: false
+  catalogs:
+    sandbox:
+      properties:
+        openldap: jamilspain
+        token: tokenkey
+        target-url: 'https://cloud.iexapis.com/stable/stock/'
+tags: []
+definitions:
+  Quote:
+    properties:
+      symbol:
+        type: string
+        description: The stock ticker symbol
+      date:
+        type: string
+        description: The date of the quote
+      time:
+        type: integer
+        description: The time of the quote
+        format: int64
+      price:
+        type: number
+        format: float
+        description: The closing price
+    additionalProperties: false
+  Error:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    additionalProperties: false
+paths:
+  /stocks/stock-quote/djia:
+    get:
+      responses:
+        '200':
+          schema:
+            type: string
+          description: success
+      consumes:
+        - application/json
+      produces:
+        - application/json
+  '/{symbol}':
+    get:
+      responses:
+        '200':
+          description: Successful result
+          schema:
+            $ref: '#/definitions/Quote'
+      operationId: getStockQuote
+      description: Get a stock quote for the specified symbol
+      parameters:
+        - name: symbol
+          type: string
+          required: true
+          in: path
+          description: Stock symbol
+      consumes:
+        - application/json
+      produces:
+        - application/json
