@@ -5,11 +5,8 @@ dependencies:
 - name: mongodb
   repository: https://charts.bitnami.com/bitnami/
   version: 7.4.2
-- name: ibm-mqadvanced-server-dev
-  repository: https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
-  version: 6.0.0
 - name: kafkaConnect
   repository: file://kafkaConnect
   version: 1.0.0
-digest: sha256:b4ab58a4658795eec66bb99829299dd935253c4a483072698431a639703ba4ea
-generated: "2020-06-05T09:20:25.811529-05:00"
+digest: sha256:af4f7c10e3f6c36508aef7f80c2699b3a224bc7b481aba9e2cb5b6605a685c0f
+generated: "2020-06-29T17:25:13.085851-04:00"
