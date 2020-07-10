@@ -52,7 +52,7 @@ stockQuoteMicroservice:
   service:
     port: 9080
   apic:
-    url: https://stock-trader-quote.us-south.cf.appdomain.cloud/stocks
+    url: https://stock-trader-quote.us-south.cf.appdomain.cloud
     clientId: <your api connect cliendId for the external stock quote service>
   image:
     repository: clouddragons/stock-quote-liberty
