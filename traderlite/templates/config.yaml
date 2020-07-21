@@ -26,6 +26,8 @@ data:
   mongodb.db.port: "{{ .Values.tradeHistoryDB.service.port }}"
   mongodb.db.host: "{{ .Release.Name }}-mongodb"
   apic.stockQuote.url: "{{ .Values.stockQuoteMicroservice.apic.url }}"
+  apic.portfolio.url: "{{ .Values.portfolioMicroservice.apic.url }}"
+  apic.tradeHistory.url: "{{ .Values.tradeHistoryMicroservice.apic.url }}"
   tradeHistory.url: "http://{{ .Release.Name }}-trade-history-service:{{ .Values.tradeHistoryMicroservice.service.port }}"
   stockQuote.url: "http://{{ .Release.Name }}-stock-quote-service:{{ .Values.stockQuoteMicroservice.service.port }}"
   portfolio.url: "http://{{ .Release.Name }}-portfolio-service:{{ .Values.portfolioMicroservice.service.port }}"

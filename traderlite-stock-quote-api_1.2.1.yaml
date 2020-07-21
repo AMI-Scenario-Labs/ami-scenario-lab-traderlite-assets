@@ -2,11 +2,11 @@ swagger: '2.0'
 info:
   title: TraderLite Stock Quote API
   x-ibm-name: traderlite-stock-quote-api
-  version: 1.1.0
+  version: 1.2.1
 host: $(catalog.host)
 schemes:
   - https
-basePath: /jamilspain
+basePath: /openldap
 produces:
   - application/json
 consumes:
@@ -27,8 +27,7 @@ x-ibm-configuration:
     openldap:
       value: ''
       description: Username from OpenLDAP
-    token:
-      value: ''
+      encoded: false
   cors:
     enabled: true
   gateway: datapower-api-gateway
@@ -42,11 +41,11 @@ x-ibm-configuration:
           version: 2.0.0
           title: switch
           case:
-            - condition: 'true'
+            - condition: ($operationPath() = '/stock-quote/djia')
               execute:
                 - invoke:
                     version: 2.0.0
-                    title: invoke
+                    title: /stock-quote/djia
                     header-control:
                       type: blacklist
                       values: []
@@ -58,24 +57,41 @@ x-ibm-configuration:
                     cache-response: protocol
                     cache-ttl: 900
                     stop-on-error: []
-                    target-url: >-
-                      https://stock-trader-quote.us-south.cf.appdomain.cloud/stocks/stock-quote/djia
-            - otherwise:
+                    target-url: $(target-url)/stock-quote/djia
+            - condition: ($operationPath() = '/stock-quote/about')
+              execute:
                 - invoke:
-                    title: invoke
                     version: 2.0.0
-                    verb: GET
-                    target-url: >-
-                      https://cloud.iexapis.com/stable/stock/$(request.parameters.symbol)/quote?token=$(api.properties.token)
-                    follow-redirects: false
-                    timeout: 60
-                    parameter-control:
-                      type: blacklist
+                    title: /stock-quote/about
                     header-control:
                       type: blacklist
-                      values:
-                        - ^X-IBM-Client-Id$
-                    inject-proxy-headers: true
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    target-url: $(target-url)/stock-quote/about
+            - condition: ($operationPath() = '/stock-quote')
+              execute:
+                - invoke:
+                    version: 2.0.0
+                    title: /stock-quote
+                    header-control:
+                      type: blacklist
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 60
+                    verb: keep
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    target-url: $(target-url)/stock-quote?$(request.querystring)
   activity-log:
     enabled: true
     error-content: header
@@ -86,8 +102,7 @@ x-ibm-configuration:
     sandbox:
       properties:
         openldap: jamilspain
-        token: tokenkey
-        target-url: 'https://cloud.iexapis.com/stable/stock/'
+        target-url: 'https://stock-trader-quote.us-south.cf.appdomain.cloud/stocks'
 tags: []
 definitions:
   Quote:
@@ -115,33 +130,42 @@ definitions:
         type: string
     additionalProperties: false
 paths:
-  /stocks/stock-quote/djia:
+  /stock-quote/djia:
     get:
       responses:
         '200':
           schema:
             type: string
           description: success
-      consumes:
-        - application/json
       produces:
         - application/json
-  '/{symbol}':
+      consumes:
+        - application/json
+  /stock-quote/about:
     get:
       responses:
         '200':
-          description: Successful result
           schema:
-            $ref: '#/definitions/Quote'
-      operationId: getStockQuote
-      description: Get a stock quote for the specified symbol
-      parameters:
-        - name: symbol
-          type: string
-          required: true
-          in: path
-          description: Stock symbol
-      consumes:
-        - application/json
+            type: string
+          description: success
       produces:
         - application/json
+      consumes:
+        - application/json
+  /stock-quote:
+    get:
+      responses:
+        '200':
+          description: success
+          schema:
+            type: string
+      produces:
+        - application/json
+      consumes:
+        - application/json
+    parameters:
+      - name: symbols
+        in: query
+        required: true
+        description: Comma separated list of symbols
+        type: string
