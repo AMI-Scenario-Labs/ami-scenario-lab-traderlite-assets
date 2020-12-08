@@ -8,7 +8,8 @@ global:
     bootstrapHost: <Event Streams bootstrap host>
   mqaccess:
     qname: "TRADE.EVENT.QUEUE"
-    qmgr: "QMTRADER"
+    qmgr: "TECHJAM"
+    listener: "mq-dev-ibm-mq_ibmmq.cloudpak-mq.svc"
     channel: "DEV.APP.SVRCONN"
     user: app
     password: passw0rd
@@ -22,7 +23,7 @@ global:
 
 mqIntegration:
   enabled: false
-  
+
 kafkaIntegration:
   enabled: false
 
@@ -38,7 +39,7 @@ kafkaConnect:
     secret:
       name: kafkaconnect-keystore
   image:
-    repository: clouddragons/stocktrader-kafka-connect-standalone-cp4i
+    repository: amitechjam/traderlite-kafka-connect-standalone-cp4i
     tag: "1.2"
     pullPolicy: Always
 
@@ -49,7 +50,7 @@ portfolioMicroservice:
     url: https://stock-trader-quote.us-south.cf.appdomain.cloud
     clientId: <your api connect cliendId for the external stock quote service>
   image:
-    repository: clouddragons/portfolio-spring-cp4i
+    repository: amitechjam/traderlite-portfolio-spring-cp4i
     tag: "1.1"
     pullPolicy: Always
     pullSecrets:
@@ -61,7 +62,7 @@ stockQuoteMicroservice:
     url: https://stock-trader-quote.us-south.cf.appdomain.cloud
     clientId: <your api connect cliendId for the external stock quote service>
   image:
-    repository: clouddragons/stock-quote-liberty
+    repository: amitechjam/traderlite-stock-quote-liberty
     tag: "1.0"
     pullPolicy: Always
     pullSecrets:
@@ -73,7 +74,7 @@ tradeHistoryMicroservice:
     url: https://stock-trader-quote.us-south.cf.appdomain.cloud
     clientId: <your api connect cliendId for the external stock quote service>
   image:
-    repository: clouddragons/trade-history-python
+    repository: amitechjam/traderlite-trade-history-python
     tag: "2.0"
     pullPolicy: Always
     pullSecrets:
@@ -82,7 +83,7 @@ tradrMicroservice:
   service:
     port: 3000
   image:
-    repository: clouddragons/tradr-node-jquery-cp4i
+    repository: amitechjam/traderlite-web-frontend
     tag: "1.0"
     pullPolicy: Always
     pullSecrets:
@@ -131,10 +132,10 @@ tradeTransactionalDB:
       enabled: false
       # storageClass: ''-''
     resources:
-     limits:
+      limits:
         cpu: 500m
         memory: 500Mi
-     requests:
+      requests:
         cpu: 200m
         memory: 250Mi
 
@@ -194,7 +195,6 @@ tradeTransactionalDB:
     ## Enable replication. This enables the creation of replicas of MariaDB. If false, only a
     ## master deployment would be created
     enabled: false
-
 
   ## initdb scripts
   ## Specify dictionnary of scripts to be run at first boot
